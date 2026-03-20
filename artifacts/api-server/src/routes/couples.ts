@@ -74,6 +74,8 @@ router.post("/pair", requireAuth, async (req, res) => {
     partnerId: partner[0].id,
     partnerName: partner[0].displayName,
     partnerUsername: partner[0].username,
+    partnerAvatar: partner[0].avatar ?? null,
+    partnerBio: partner[0].bio ?? null,
     pairedAt: couple.pairedAt.toISOString(),
   });
 });
@@ -99,6 +101,8 @@ router.get("/me", requireAuth, async (req, res) => {
     partnerId: partner.id,
     partnerName: partner.displayName,
     partnerUsername: partner.username,
+    partnerAvatar: partner.avatar ?? null,
+    partnerBio: partner.bio ?? null,
     pairedAt: couple.pairedAt.toISOString(),
   });
 });

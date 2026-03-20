@@ -12,4 +12,6 @@ export interface UserResponse {
   displayName: string;
   reminderTime?: string | null;
   isPaired: boolean;
+  avatar?: string | null;
+  bio?: string | null;
 }

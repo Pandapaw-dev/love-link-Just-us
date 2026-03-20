@@ -11,5 +11,7 @@ export interface CoupleResponse {
   partnerId: number;
   partnerName: string;
   partnerUsername: string;
+  partnerAvatar?: string | null;
+  partnerBio?: string | null;
   pairedAt: string;
 }

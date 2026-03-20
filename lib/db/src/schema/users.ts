@@ -8,6 +8,8 @@ export const usersTable = pgTable("users", {
   displayName: text("display_name").notNull(),
   passwordHash: text("password_hash").notNull(),
   reminderTime: text("reminder_time"),
+  avatar: text("avatar"),
+  bio: text("bio"),
   pairingCode: text("pairing_code"),
   pairingCodeExpiresAt: timestamp("pairing_code_expires_at"),
   coupleId: integer("couple_id"),

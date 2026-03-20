@@ -2,8 +2,18 @@ import { useState } from "react";
 import { useGetMe, useGetMyCouple } from "@workspace/api-client-react";
 import { useAuthMutations } from "@/hooks/use-app-queries";
 import { AppLayout } from "@/components/AppLayout";
-import { User, LogOut, Clock, Heart, Copy, Check, Settings } from "lucide-react";
-import { motion } from "framer-motion";
+import { LogOut, Clock, Heart, Copy, Check, Settings, Edit2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
+
+const EMOJI_OPTIONS = [
+  "💕", "💖", "💗", "💓", "💞", "💘", "🌸", "🌺", "🌹", "🌷", "🌻", "⭐", 
+  "🌙", "✨", "🦋", "🐰", "🐱", "🐻", "🦊", "🐼", "🍓", "🍒", "🍑", "🎀"
+];
+
+function getInitials(name: string) {
+  return name.slice(0, 2).toUpperCase();
+}
 
 export default function ProfilePage() {
   const { data: user } = useGetMe();
@@ -14,10 +24,12 @@ export default function ProfilePage() {
   const [copied, setCopied] = useState(false);
   const [isEditingTime, setIsEditingTime] = useState(false);
   const [time, setTime] = useState(user?.reminderTime || "09:00");
+  
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [isEditingBio, setIsEditingBio] = useState(false);
+  const [bioText, setBioText] = useState("");
 
   const handleCopyPartnerId = () => {
-    // We don't have the pairing code anymore once paired, but we can show something else or just their names.
-    // Assuming the requirement meant showing the pair status.
     if (couple?.partnerUsername) {
       navigator.clipboard.writeText(couple.partnerUsername);
       setCopied(true);
@@ -28,6 +40,22 @@ export default function ProfilePage() {
   const handleSaveTime = () => {
     updateMe.mutate({ data: { reminderTime: time } }, {
       onSuccess: () => setIsEditingTime(false)
+    });
+  };
+
+  const handleSelectEmoji = (emoji: string) => {
+    updateMe.mutate({ data: { avatar: emoji } });
+    setIsPickerOpen(false);
+  };
+  
+  const handleStartEditBio = () => {
+    setBioText(user?.bio || "");
+    setIsEditingBio(true);
+  };
+  
+  const handleSaveBio = () => {
+    updateMe.mutate({ data: { bio: bioText } }, {
+      onSuccess: () => setIsEditingBio(false)
     });
   };
 
@@ -44,14 +72,93 @@ export default function ProfilePage() {
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass-card rounded-[2rem] p-6 flex items-center gap-5"
+          className="glass-card rounded-[2rem] p-6 flex flex-col items-center text-center relative"
         >
-          <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-            <User className="w-8 h-8 text-primary" />
-          </div>
-          <div>
+          <button 
+            onClick={() => setIsPickerOpen(!isPickerOpen)}
+            className="w-20 h-20 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm border border-primary/10 relative hover:scale-105 transition-transform"
+          >
+            {user.avatar ? (
+              <span className="text-4xl leading-none">{user.avatar}</span>
+            ) : (
+              <span className="text-xl font-bold text-foreground">{getInitials(user.displayName)}</span>
+            )}
+            <div className="absolute bottom-0 right-0 w-6 h-6 bg-white dark:bg-black rounded-full flex items-center justify-center shadow-md border border-border">
+              <Edit2 className="w-3 h-3 text-muted-foreground" />
+            </div>
+          </button>
+          
+          <AnimatePresence>
+            {isPickerOpen && (
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden w-full max-w-[280px]"
+              >
+                <div className="grid grid-cols-6 gap-2 py-4 px-2">
+                  {EMOJI_OPTIONS.map((emoji) => (
+                    <button
+                      key={emoji}
+                      onClick={() => handleSelectEmoji(emoji)}
+                      className="text-2xl hover:scale-125 transition-transform p-1 leading-none"
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div className="mt-4">
             <h2 className="text-xl font-bold text-foreground">{user.displayName}</h2>
             <p className="text-muted-foreground text-sm">@{user.username}</p>
+          </div>
+          
+          <div className="mt-4 w-full">
+            {isEditingBio ? (
+              <div className="w-full">
+                <textarea 
+                  value={bioText}
+                  onChange={(e) => setBioText(e.target.value)}
+                  maxLength={200}
+                  className="w-full bg-white/50 dark:bg-black/50 border border-border rounded-xl p-3 text-sm focus:outline-none focus:border-primary resize-none min-h-[80px]"
+                  placeholder="Tell us a little about yourself..."
+                />
+                <div className="flex justify-end gap-2 mt-2">
+                  <button 
+                    onClick={() => setIsEditingBio(false)}
+                    className="px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-secondary rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={handleSaveBio}
+                    disabled={updateMe.isPending}
+                    className="px-3 py-1.5 text-xs font-medium bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div 
+                onClick={handleStartEditBio}
+                className="cursor-pointer group flex flex-col items-center"
+              >
+                {user.bio ? (
+                  <p className="text-sm text-foreground/80 flex items-center justify-center gap-2">
+                    {user.bio}
+                    <Edit2 className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground font-medium flex items-center justify-center gap-1 hover:text-primary transition-colors">
+                    + Add a bio
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         </motion.div>
 
@@ -69,16 +176,35 @@ export default function ProfilePage() {
                 <Heart className="w-4 h-4 fill-white" />
                 <span className="text-sm font-semibold uppercase tracking-wider">Paired With</span>
               </div>
-              <h2 className="text-2xl font-bold mb-1">{couple.partnerName}</h2>
-              <div className="flex items-center gap-2 text-white/80 text-sm">
-                <span>@{couple.partnerUsername}</span>
-                <button 
-                  onClick={handleCopyPartnerId}
-                  className="p-1.5 hover:bg-white/20 rounded-md transition-colors"
-                >
-                  {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                </button>
+              
+              <div className="flex items-center gap-4 mb-2">
+                <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm border border-white/20">
+                  {couple.partnerAvatar ? (
+                    <span className="text-2xl leading-none">{couple.partnerAvatar}</span>
+                  ) : (
+                    <span className="text-lg font-bold text-white">{getInitials(couple.partnerName)}</span>
+                  )}
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold mb-1">{couple.partnerName}</h2>
+                  <div className="flex items-center gap-2 text-white/80 text-sm">
+                    <span>@{couple.partnerUsername}</span>
+                    <button 
+                      onClick={handleCopyPartnerId}
+                      className="p-1.5 hover:bg-white/20 rounded-md transition-colors"
+                    >
+                      {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
+                </div>
               </div>
+              
+              {couple.partnerBio && (
+                <p className="text-sm italic text-white/80 mt-2">
+                  "{couple.partnerBio}"
+                </p>
+              )}
+              
               <p className="text-xs text-white/60 mt-4">
                 Together since {new Date(couple.pairedAt).toLocaleDateString()}
               </p>

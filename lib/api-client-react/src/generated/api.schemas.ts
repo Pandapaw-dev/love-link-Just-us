@@ -33,6 +33,10 @@ export interface UpdateUserRequest {
   displayName?: string;
   /** HH:MM format e.g. 08:00 */
   reminderTime?: string;
+  /** Avatar identifier — emoji string or color key e.g. '💕' or 'rose' */
+  avatar?: string;
+  /** @maxLength 200 */
+  bio?: string;
 }
 
 export interface UserResponse {
@@ -41,6 +45,8 @@ export interface UserResponse {
   displayName: string;
   reminderTime?: string | null;
   isPaired: boolean;
+  avatar?: string | null;
+  bio?: string | null;
 }
 
 export interface PairingCodeResponse {
@@ -57,6 +63,8 @@ export interface CoupleResponse {
   partnerId: number;
   partnerName: string;
   partnerUsername: string;
+  partnerAvatar?: string | null;
+  partnerBio?: string | null;
   pairedAt: string;
 }
 

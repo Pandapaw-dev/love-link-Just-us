@@ -21,6 +21,8 @@ const loginSchema = z.object({
 const updateSchema = z.object({
   displayName: z.string().min(1).max(100).optional(),
   reminderTime: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+  avatar: z.string().max(100).optional(),
+  bio: z.string().max(200).optional(),
 });
 
 router.post("/register", async (req, res) => {
@@ -41,14 +43,20 @@ router.post("/register", async (req, res) => {
   const [user] = await db.insert(usersTable).values({ username, displayName, passwordHash }).returning();
 
   req.session.userId = user.id;
-  res.status(201).json({
+  res.status(201).json(formatUser(user));
+});
+
+function formatUser(user: typeof usersTable.$inferSelect) {
+  return {
     id: user.id,
     username: user.username,
     displayName: user.displayName,
-    reminderTime: user.reminderTime,
+    reminderTime: user.reminderTime ?? null,
     isPaired: !!user.coupleId,
-  });
-});
+    avatar: user.avatar ?? null,
+    bio: user.bio ?? null,
+  };
+}
 
 router.post("/login", async (req, res) => {
   const parsed = loginSchema.safeParse(req.body);
@@ -71,13 +79,7 @@ router.post("/login", async (req, res) => {
   }
 
   req.session.userId = user.id;
-  res.json({
-    id: user.id,
-    username: user.username,
-    displayName: user.displayName,
-    reminderTime: user.reminderTime,
-    isPaired: !!user.coupleId,
-  });
+  res.json(formatUser(user));
 });
 
 router.get("/me", requireAuth, async (req, res) => {
@@ -86,13 +88,7 @@ router.get("/me", requireAuth, async (req, res) => {
     res.status(401).json({ error: "User not found" });
     return;
   }
-  res.json({
-    id: user.id,
-    username: user.username,
-    displayName: user.displayName,
-    reminderTime: user.reminderTime,
-    isPaired: !!user.coupleId,
-  });
+  res.json(formatUser(user));
 });
 
 router.patch("/me", requireAuth, async (req, res) => {
@@ -104,15 +100,11 @@ router.patch("/me", requireAuth, async (req, res) => {
   const updates: Record<string, string> = {};
   if (parsed.data.displayName) updates.displayName = parsed.data.displayName;
   if (parsed.data.reminderTime !== undefined) updates.reminderTime = parsed.data.reminderTime;
+  if (parsed.data.avatar !== undefined) updates.avatar = parsed.data.avatar;
+  if (parsed.data.bio !== undefined) updates.bio = parsed.data.bio;
 
   const [user] = await db.update(usersTable).set(updates).where(eq(usersTable.id, req.session.userId!)).returning();
-  res.json({
-    id: user.id,
-    username: user.username,
-    displayName: user.displayName,
-    reminderTime: user.reminderTime,
-    isPaired: !!user.coupleId,
-  });
+  res.json(formatUser(user));
 });
 
 router.post("/logout", (req, res) => {

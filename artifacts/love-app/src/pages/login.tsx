@@ -78,7 +78,7 @@ export default function LoginPage() {
           transition={{ delay: 0.2 }}
           className="text-center mb-10"
         >
-          <h1 className="text-4xl font-display font-bold text-foreground mb-2">us</h1>
+          <h1 className="text-4xl font-display font-bold text-foreground mb-2">Just us</h1>
           <p className="text-muted-foreground text-lg">Your private space for love.</p>
         </motion.div>
 
@@ -181,7 +181,7 @@ export default function LoginPage() {
               {(login.isPending || register.isPending) ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
-                isLogin ? "Sign In to us" : "Start Our Journey"
+                isLogin ? "Sign In to Just us" : "Start Our Journey"
               )}
             </button>
           </form>

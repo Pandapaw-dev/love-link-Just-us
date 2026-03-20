@@ -45,11 +45,21 @@ export default function HomePage() {
         <motion.div 
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/60 backdrop-blur-md shadow-sm border border-white/40 mb-4"
+          className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/60 backdrop-blur-md shadow-sm border border-white/40 mb-4"
         >
-          <span className="font-medium text-foreground">{user.displayName}</span>
-          <Heart className="w-4 h-4 text-primary fill-primary/50" />
-          <span className="font-medium text-foreground">{couple.partnerName}</span>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center text-sm font-bold text-foreground shrink-0 shadow-sm border border-primary/10">
+              {user.avatar ? <span className="text-base leading-none">{user.avatar}</span> : user.displayName.slice(0, 2).toUpperCase()}
+            </div>
+            <span className="font-medium text-foreground">{user.displayName}</span>
+          </div>
+          <Heart className="w-4 h-4 text-primary fill-primary/50 shrink-0" />
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-foreground">{couple.partnerName}</span>
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center text-sm font-bold text-foreground shrink-0 shadow-sm border border-primary/10">
+              {couple.partnerAvatar ? <span className="text-base leading-none">{couple.partnerAvatar}</span> : couple.partnerName.slice(0, 2).toUpperCase()}
+            </div>
+          </div>
         </motion.div>
         <h1 className="text-3xl font-display font-bold text-foreground">
           {checkin?.bothDone ? "Love is in the air ✨" : "Good morning, love."}

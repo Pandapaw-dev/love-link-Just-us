@@ -37,6 +37,8 @@ export const LoginUserResponse = zod.object({
   displayName: zod.string(),
   reminderTime: zod.string().nullish(),
   isPaired: zod.boolean(),
+  avatar: zod.string().nullish(),
+  bio: zod.string().nullish(),
 });
 
 /**
@@ -48,14 +50,25 @@ export const GetMeResponse = zod.object({
   displayName: zod.string(),
   reminderTime: zod.string().nullish(),
   isPaired: zod.boolean(),
+  avatar: zod.string().nullish(),
+  bio: zod.string().nullish(),
 });
 
 /**
  * @summary Update current user profile
  */
+export const updateMeBodyBioMax = 200;
+
 export const UpdateMeBody = zod.object({
   displayName: zod.string().optional(),
   reminderTime: zod.string().optional().describe("HH:MM format e.g. 08:00"),
+  avatar: zod
+    .string()
+    .optional()
+    .describe(
+      "Avatar identifier — emoji string or color key e.g. '💕' or 'rose'",
+    ),
+  bio: zod.string().max(updateMeBodyBioMax).optional(),
 });
 
 export const UpdateMeResponse = zod.object({
@@ -64,6 +77,8 @@ export const UpdateMeResponse = zod.object({
   displayName: zod.string(),
   reminderTime: zod.string().nullish(),
   isPaired: zod.boolean(),
+  avatar: zod.string().nullish(),
+  bio: zod.string().nullish(),
 });
 
 /**
@@ -94,6 +109,8 @@ export const PairWithCodeResponse = zod.object({
   partnerId: zod.number(),
   partnerName: zod.string(),
   partnerUsername: zod.string(),
+  partnerAvatar: zod.string().nullish(),
+  partnerBio: zod.string().nullish(),
   pairedAt: zod.string(),
 });
 
@@ -105,6 +122,8 @@ export const GetMyCoupleResponse = zod.object({
   partnerId: zod.number(),
   partnerName: zod.string(),
   partnerUsername: zod.string(),
+  partnerAvatar: zod.string().nullish(),
+  partnerBio: zod.string().nullish(),
   pairedAt: zod.string(),
 });
 

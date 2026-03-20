@@ -10,4 +10,8 @@ export interface UpdateUserRequest {
   displayName?: string;
   /** HH:MM format e.g. 08:00 */
   reminderTime?: string;
+  /** Avatar identifier — emoji string or color key e.g. '💕' or 'rose' */
+  avatar?: string;
+  /** @maxLength 200 */
+  bio?: string;
 }

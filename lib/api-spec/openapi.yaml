@@ -412,6 +412,12 @@ components:
         reminderTime:
           type: string
           description: "HH:MM format e.g. 08:00"
+        avatar:
+          type: string
+          description: "Avatar identifier — emoji string or color key e.g. '💕' or 'rose'"
+        bio:
+          type: string
+          maxLength: 200
 
     UserResponse:
       type: object
@@ -427,6 +433,12 @@ components:
           nullable: true
         isPaired:
           type: boolean
+        avatar:
+          type: string
+          nullable: true
+        bio:
+          type: string
+          nullable: true
       required: [id, username, displayName, isPaired]
 
     PairingCodeResponse:
@@ -456,6 +468,12 @@ components:
           type: string
         partnerUsername:
           type: string
+        partnerAvatar:
+          type: string
+          nullable: true
+        partnerBio:
+          type: string
+          nullable: true
         pairedAt:
           type: string
       required: [id, partnerId, partnerName, partnerUsername, pairedAt]

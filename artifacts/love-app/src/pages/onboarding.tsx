@@ -66,7 +66,7 @@ export default function OnboardingPage() {
             Welcome, {user?.displayName}
           </h1>
           <p className="text-muted-foreground px-4">
-            "Us" is a private space for just two people. Let's connect you with your partner.
+            "Just us" is a private space for just two people. Let's connect you with your partner.
           </p>
         </motion.div>
 
