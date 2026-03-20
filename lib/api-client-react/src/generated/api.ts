@@ -17,8 +17,11 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+  ChatMessage,
+  ChatMessagesResponse,
   CoupleResponse,
   ErrorResponse,
+  GetChatMessagesParams,
   GetMessagesParams,
   HealthStatus,
   LoginRequest,
@@ -29,6 +32,7 @@ import type {
   PairRequest,
   PairingCodeResponse,
   RegisterUserRequest,
+  SendChatMessageRequest,
   SendMessageRequest,
   StreakResponse,
   SuccessResponse,
@@ -1412,3 +1416,183 @@ export function useGetNotificationStatus<
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+/**
+ * @summary Get chat messages
+ */
+export const getGetChatMessagesUrl = (params?: GetChatMessagesParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/chat?${stringifiedParams}`
+    : `/api/chat`;
+};
+
+export const getChatMessages = async (
+  params?: GetChatMessagesParams,
+  options?: RequestInit,
+): Promise<ChatMessagesResponse> => {
+  return customFetch<ChatMessagesResponse>(getGetChatMessagesUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetChatMessagesQueryKey = (params?: GetChatMessagesParams) => {
+  return [`/api/chat`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetChatMessagesQueryOptions = <
+  TData = Awaited<ReturnType<typeof getChatMessages>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: GetChatMessagesParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getChatMessages>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetChatMessagesQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getChatMessages>>> = ({
+    signal,
+  }) => getChatMessages(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getChatMessages>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetChatMessagesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getChatMessages>>
+>;
+export type GetChatMessagesQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get chat messages
+ */
+
+export function useGetChatMessages<
+  TData = Awaited<ReturnType<typeof getChatMessages>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: GetChatMessagesParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getChatMessages>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetChatMessagesQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Send a chat message to partner
+ */
+export const getSendChatMessageUrl = () => {
+  return `/api/chat`;
+};
+
+export const sendChatMessage = async (
+  sendChatMessageRequest: SendChatMessageRequest,
+  options?: RequestInit,
+): Promise<ChatMessage> => {
+  return customFetch<ChatMessage>(getSendChatMessageUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(sendChatMessageRequest),
+  });
+};
+
+export const getSendChatMessageMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof sendChatMessage>>,
+    TError,
+    { data: BodyType<SendChatMessageRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof sendChatMessage>>,
+  TError,
+  { data: BodyType<SendChatMessageRequest> },
+  TContext
+> => {
+  const mutationKey = ["sendChatMessage"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof sendChatMessage>>,
+    { data: BodyType<SendChatMessageRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return sendChatMessage(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SendChatMessageMutationResult = NonNullable<
+  Awaited<ReturnType<typeof sendChatMessage>>
+>;
+export type SendChatMessageMutationBody = BodyType<SendChatMessageRequest>;
+export type SendChatMessageMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Send a chat message to partner
+ */
+export const useSendChatMessage = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof sendChatMessage>>,
+    TError,
+    { data: BodyType<SendChatMessageRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof sendChatMessage>>,
+  TError,
+  { data: BodyType<SendChatMessageRequest> },
+  TContext
+> => {
+  return useMutation(getSendChatMessageMutationOptions(options));
+};

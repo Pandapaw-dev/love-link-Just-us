@@ -46,13 +46,20 @@ export default function LoginPage() {
   return (
     <div className="min-h-[100dvh] w-full flex flex-col items-center justify-center relative overflow-hidden bg-background">
       {/* Background Image & Overlay */}
-      <div className="absolute inset-0 z-0">
-        <img 
-          src={`${import.meta.env.BASE_URL}images/login-bg.png`} 
-          alt="Romantic gradient background" 
-          className="w-full h-full object-cover opacity-60 mix-blend-multiply"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/80 to-background z-10" />
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.12]">
+        <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="login-doodle-pattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+              <path d="M 20 30 C 20 20, 35 20, 35 30 C 35 40, 20 50, 20 50 C 20 50, 5 40, 5 30 C 5 20, 20 20, 20 30 Z" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-primary" transform="scale(0.5) translate(20, 20)" />
+              <path d="M 50 10 L 53 20 L 63 20 L 55 26 L 58 36 L 50 30 L 42 36 L 45 26 L 37 20 L 47 20 Z" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" className="text-primary" transform="scale(0.4) translate(140, 40)" />
+              <path d="M 80 70 C 80 60, 90 60, 90 70 C 90 80, 75 80, 75 65 C 75 50, 95 50, 95 75" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-primary" transform="scale(0.5) translate(80, 80)" />
+              <circle cx="20" cy="80" r="1.5" fill="currentColor" className="text-primary" />
+              <path d="M 70 20 L 76 26 M 76 20 L 70 26" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-primary" />
+              <path d="M 40 80 L 46 80 M 43 77 L 43 83" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-primary" />
+            </pattern>
+          </defs>
+          <rect x="0" y="0" width="100%" height="100%" fill="url(#login-doodle-pattern)" />
+        </svg>
       </div>
 
       <div className="w-full max-w-md px-6 py-12 z-20 flex flex-col items-center">
@@ -71,7 +78,7 @@ export default function LoginPage() {
           transition={{ delay: 0.2 }}
           className="text-center mb-10"
         >
-          <h1 className="text-4xl font-display font-bold text-foreground mb-2">Us.</h1>
+          <h1 className="text-4xl font-display font-bold text-foreground mb-2">us</h1>
           <p className="text-muted-foreground text-lg">Your private space for love.</p>
         </motion.div>
 
@@ -174,7 +181,7 @@ export default function LoginPage() {
               {(login.isPending || register.isPending) ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
-                isLogin ? "Sign In to Us" : "Start Our Journey"
+                isLogin ? "Sign In to us" : "Start Our Journey"
               )}
             </button>
           </form>

@@ -5,6 +5,7 @@ import couplesRouter from "./couples.js";
 import checkinsRouter from "./checkins.js";
 import messagesRouter from "./messages.js";
 import notificationsRouter from "./notifications.js";
+import chatRouter from "./chat.js";
 
 const router: IRouter = Router();
 
@@ -14,5 +15,6 @@ router.use("/couples", couplesRouter);
 router.use("/checkins", checkinsRouter);
 router.use("/messages", messagesRouter);
 router.use("/notifications", notificationsRouter);
+router.use("/chat", chatRouter);
 
 export default router;

@@ -9,6 +9,7 @@ import OnboardingPage from "./pages/onboarding";
 import HomePage from "./pages/home";
 import TimelinePage from "./pages/timeline";
 import ProfilePage from "./pages/profile";
+import ChatPage from "./pages/chat";
 import NotFound from "./pages/not-found";
 import { useEffect } from "react";
 
@@ -72,6 +73,11 @@ function Router() {
       <Route path="/timeline">
         <AuthGuard>
           <TimelinePage />
+        </AuthGuard>
+      </Route>
+      <Route path="/chat">
+        <AuthGuard>
+          <ChatPage />
         </AuthGuard>
       </Route>
       <Route path="/profile">

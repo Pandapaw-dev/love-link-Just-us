@@ -215,3 +215,35 @@ export const GetNotificationStatusResponse = zod.object({
     .nullish(),
   missYouSentAt: zod.string().nullish(),
 });
+
+/**
+ * @summary Get chat messages
+ */
+export const getChatMessagesQueryLimitDefault = 50;
+
+export const GetChatMessagesQueryParams = zod.object({
+  since: zod.coerce.number().optional(),
+  limit: zod.coerce.number().default(getChatMessagesQueryLimitDefault),
+});
+
+export const GetChatMessagesResponse = zod.object({
+  messages: zod.array(
+    zod.object({
+      id: zod.number(),
+      senderId: zod.number(),
+      senderName: zod.string(),
+      text: zod.string(),
+      sentAt: zod.string(),
+      isFromMe: zod.boolean(),
+    }),
+  ),
+});
+
+/**
+ * @summary Send a chat message to partner
+ */
+export const sendChatMessageBodyTextMax = 1000;
+
+export const SendChatMessageBody = zod.object({
+  text: zod.string().max(sendChatMessageBodyTextMax),
+});

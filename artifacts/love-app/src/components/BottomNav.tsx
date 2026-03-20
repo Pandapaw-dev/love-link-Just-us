@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, MessageSquareHeart, UserCircle } from "lucide-react";
+import { Home, MessageSquareHeart, UserCircle, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
@@ -7,7 +7,8 @@ export function BottomNav() {
   const [location] = useLocation();
 
   const navItems = [
-    { path: "/", icon: Home, label: "Us" },
+    { path: "/", icon: Home, label: "us" },
+    { path: "/chat", icon: MessageCircle, label: "Chat" },
     { path: "/timeline", icon: MessageSquareHeart, label: "Timeline" },
     { path: "/profile", icon: UserCircle, label: "Profile" },
   ];

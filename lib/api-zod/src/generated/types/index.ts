@@ -6,8 +6,11 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from "./chatMessage";
+export * from "./chatMessagesResponse";
 export * from "./coupleResponse";
 export * from "./errorResponse";
+export * from "./getChatMessagesParams";
 export * from "./getMessagesParams";
 export * from "./healthStatus";
 export * from "./loginRequest";
@@ -21,6 +24,7 @@ export * from "./notificationStatusResponsePartnerMood";
 export * from "./pairingCodeResponse";
 export * from "./pairRequest";
 export * from "./registerUserRequest";
+export * from "./sendChatMessageRequest";
 export * from "./sendMessageRequest";
 export * from "./streakResponse";
 export * from "./successResponse";

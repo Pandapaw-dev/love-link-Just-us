@@ -318,6 +318,47 @@ paths:
               schema:
                 $ref: "#/components/schemas/NotificationStatusResponse"
 
+  /chat:
+    get:
+      operationId: getChatMessages
+      tags: [chat]
+      summary: Get chat messages
+      parameters:
+        - name: since
+          in: query
+          schema:
+            type: integer
+            description: Last message id seen — returns only newer messages
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: Chat messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatMessagesResponse"
+    post:
+      operationId: sendChatMessage
+      tags: [chat]
+      summary: Send a chat message to partner
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendChatMessageRequest"
+      responses:
+        "201":
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatMessage"
+
 components:
   schemas:
     HealthStatus:
@@ -508,3 +549,37 @@ components:
           type: string
           nullable: true
       required: [partnerMissesYou]
+
+    SendChatMessageRequest:
+      type: object
+      properties:
+        text:
+          type: string
+          maxLength: 1000
+      required: [text]
+
+    ChatMessage:
+      type: object
+      properties:
+        id:
+          type: integer
+        senderId:
+          type: integer
+        senderName:
+          type: string
+        text:
+          type: string
+        sentAt:
+          type: string
+        isFromMe:
+          type: boolean
+      required: [id, senderId, senderName, text, sentAt, isFromMe]
+
+    ChatMessagesResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatMessage"
+      required: [messages]

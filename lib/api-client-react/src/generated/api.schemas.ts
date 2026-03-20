@@ -133,7 +133,33 @@ export interface NotificationStatusResponse {
   missYouSentAt?: string | null;
 }
 
+export interface SendChatMessageRequest {
+  /** @maxLength 1000 */
+  text: string;
+}
+
+export interface ChatMessage {
+  id: number;
+  senderId: number;
+  senderName: string;
+  text: string;
+  sentAt: string;
+  isFromMe: boolean;
+}
+
+export interface ChatMessagesResponse {
+  messages: ChatMessage[];
+}
+
 export type GetMessagesParams = {
   limit?: number;
   offset?: number;
+};
+
+export type GetChatMessagesParams = {
+  /**
+   * Last message id seen — returns only newer messages
+   */
+  since?: number;
+  limit?: number;
 };
