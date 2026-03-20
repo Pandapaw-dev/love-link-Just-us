@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Us"
+version = "1.0.0"
+id = "artifacts/love-app"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24455
+
+[services.development]
+run = "pnpm --filter @workspace/love-app run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/love-app", "run", "build" ]
+publicDir = "artifacts/love-app/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24455"
+BASE_PATH = "/"

@@ -1,22 +1,30 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Relationship app API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: users
+    description: User operations
+  - name: couples
+    description: Couple/pairing operations
+  - name: checkins
+    description: Daily checkin operations
+  - name: messages
+    description: Daily messages operations
+  - name: notifications
+    description: Notification operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +32,292 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /users/register:
+    post:
+      operationId: registerUser
+      tags: [users]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterUserRequest"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "409":
+          description: Username taken
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /users/login:
+    post:
+      operationId: loginUser
+      tags: [users]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /users/me:
+    get:
+      operationId: getMe
+      tags: [users]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateMe
+      tags: [users]
+      summary: Update current user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRequest"
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+
+  /users/logout:
+    post:
+      operationId: logoutUser
+      tags: [users]
+      summary: Logout
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /couples/generate-code:
+    post:
+      operationId: generatePairingCode
+      tags: [couples]
+      summary: Generate a pairing code for the current user
+      responses:
+        "200":
+          description: Pairing code generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PairingCodeResponse"
+
+  /couples/pair:
+    post:
+      operationId: pairWithCode
+      tags: [couples]
+      summary: Pair with a partner using a code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PairRequest"
+      responses:
+        "200":
+          description: Paired successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoupleResponse"
+        "400":
+          description: Invalid or expired code
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /couples/me:
+    get:
+      operationId: getMyCouple
+      tags: [couples]
+      summary: Get current couple info
+      responses:
+        "200":
+          description: Couple info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoupleResponse"
+        "404":
+          description: Not paired yet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /checkins/today:
+    get:
+      operationId: getTodayCheckin
+      tags: [checkins]
+      summary: Get today's checkin status for couple
+      responses:
+        "200":
+          description: Today's checkin
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TodayCheckinResponse"
+    post:
+      operationId: doCheckin
+      tags: [checkins]
+      summary: Complete today's love reminder checkin
+      responses:
+        "200":
+          description: Checkin recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TodayCheckinResponse"
+
+  /checkins/streak:
+    get:
+      operationId: getStreak
+      tags: [checkins]
+      summary: Get streak info
+      responses:
+        "200":
+          description: Streak data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StreakResponse"
+
+  /messages:
+    get:
+      operationId: getMessages
+      tags: [messages]
+      summary: Get shared message timeline
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 30
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: Messages list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessagesResponse"
+    post:
+      operationId: sendMessage
+      tags: [messages]
+      summary: Send today's daily message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendMessageRequest"
+      responses:
+        "201":
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageItem"
+        "409":
+          description: Already sent a message today
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /notifications/miss-you:
+    post:
+      operationId: sendMissYou
+      tags: [notifications]
+      summary: Send a "miss you" to your partner
+      responses:
+        "200":
+          description: Notification sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /notifications/mood:
+    post:
+      operationId: setMood
+      tags: [notifications]
+      summary: Set today's mood
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MoodRequest"
+      responses:
+        "200":
+          description: Mood set
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /notifications/status:
+    get:
+      operationId: getNotificationStatus
+      tags: [notifications]
+      summary: Get partner notifications and mood status
+      responses:
+        "200":
+          description: Notification status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationStatusResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +325,186 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required: [success]
+
+    RegisterUserRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        displayName:
+          type: string
+        password:
+          type: string
+      required: [username, displayName, password]
+
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required: [username, password]
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        displayName:
+          type: string
+        reminderTime:
+          type: string
+          description: "HH:MM format e.g. 08:00"
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        displayName:
+          type: string
+        reminderTime:
+          type: string
+          nullable: true
+        isPaired:
+          type: boolean
+      required: [id, username, displayName, isPaired]
+
+    PairingCodeResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        expiresAt:
+          type: string
+      required: [code, expiresAt]
+
+    PairRequest:
+      type: object
+      properties:
+        code:
+          type: string
+      required: [code]
+
+    CoupleResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        partnerId:
+          type: integer
+        partnerName:
+          type: string
+        partnerUsername:
+          type: string
+        pairedAt:
+          type: string
+      required: [id, partnerId, partnerName, partnerUsername, pairedAt]
+
+    TodayCheckinResponse:
+      type: object
+      properties:
+        myCheckin:
+          type: boolean
+        partnerCheckin:
+          type: boolean
+        date:
+          type: string
+        bothDone:
+          type: boolean
+      required: [myCheckin, partnerCheckin, date, bothDone]
+
+    StreakResponse:
+      type: object
+      properties:
+        currentStreak:
+          type: integer
+        longestStreak:
+          type: integer
+        lastBothCheckinDate:
+          type: string
+          nullable: true
+      required: [currentStreak, longestStreak]
+
+    SendMessageRequest:
+      type: object
+      properties:
+        text:
+          type: string
+          maxLength: 500
+      required: [text]
+
+    MessageItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        senderId:
+          type: integer
+        senderName:
+          type: string
+        text:
+          type: string
+        sentAt:
+          type: string
+        isFromMe:
+          type: boolean
+      required: [id, senderId, senderName, text, sentAt, isFromMe]
+
+    MessagesResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/MessageItem"
+        total:
+          type: integer
+      required: [messages, total]
+
+    MoodRequest:
+      type: object
+      properties:
+        mood:
+          type: string
+          enum: [happy, neutral, sad]
+      required: [mood]
+
+    NotificationStatusResponse:
+      type: object
+      properties:
+        partnerMissesYou:
+          type: boolean
+        partnerMood:
+          type: string
+          nullable: true
+          enum: [happy, neutral, sad, null]
+        partnerMoodSetAt:
+          type: string
+          nullable: true
+        myMood:
+          type: string
+          nullable: true
+          enum: [happy, neutral, sad, null]
+        missYouSentAt:
+          type: string
+          nullable: true
+      required: [partnerMissesYou]

@@ -1,0 +1,22 @@
+packages:
+  "framer-motion": "For fluid, romantic page transitions and micro-interactions"
+  "date-fns": "For formatting timeline dates and streak displays"
+  "react-hook-form": "For robust form handling in login and profile"
+  "@hookform/resolvers": "For integrating Zod validation with react-hook-form"
+  "zod": "For frontend form schema validation"
+  "clsx": "For conditional class name merging"
+  "tailwind-merge": "For safely merging tailwind classes in custom components"
+  "lucide-react": "For beautiful, consistent iconography"
+
+images:
+  - path: "artifacts/love-app/public/images/login-bg.png"
+    description: "Soft, abstract romantic gradient background blending warm cream, soft rose pink, and hints of deep red. Very gentle and emotional, like a watercolor wash."
+    aspect_ratio: "9:16"
+  - path: "artifacts/love-app/public/images/heart-texture.png"
+    description: "Subtle noise texture overlay for the main heart button, giving it a premium tactile feel. Transparent background, soft white/pink noise."
+    aspect_ratio: "1:1"
+
+notes:
+  - Application uses session cookies for auth, so requests to /api/users/me will verify session.
+  - The API client is pre-generated; hooks are imported from @workspace/api-client-react.
+  - Mobile-first layout with a fixed bottom navigation bar for the core app experience.
