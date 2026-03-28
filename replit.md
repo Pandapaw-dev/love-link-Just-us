@@ -22,7 +22,7 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 ```text
 artifacts-monorepo/
 ├── artifacts/              # Deployable applications
-│   ├── api-server/         # Express API server
+│   ├── api-server/         # Express API server (port 3001 local / 8080 Replit)
 │   └── love-app/           # "Us" relationship app (React + Vite)
 ├── lib/                    # Shared libraries
 │   ├── api-spec/           # OpenAPI spec + Orval codegen config
@@ -30,6 +30,7 @@ artifacts-monorepo/
 │   ├── api-zod/            # Generated Zod schemas from OpenAPI
 │   └── db/                 # Drizzle ORM schema + DB connection
 ├── scripts/                # Utility scripts
+├── .env.example            # Template for local environment variables
 ├── pnpm-workspace.yaml     # pnpm workspace
 ├── tsconfig.base.json      # Shared TS options
 ├── tsconfig.json           # Root TS project references
@@ -48,6 +49,7 @@ The main artifact is a 2-person private relationship app named **"Us"** at previ
 5. **Miss You Button** — instantly notifies partner they're missed
 6. **Mood Check** — happy/neutral/sad mood set once per day, visible to partner
 7. **Daily Message Timeline** — 1 short message per person per day, shared feed
+8. **Private Chat** — real-time messaging between partners
 
 ### Database Tables
 - `users` — accounts with session, pairing code, coupleId
@@ -56,6 +58,15 @@ The main artifact is a 2-person private relationship app named **"Us"** at previ
 - `messages` — daily messages per couple
 - `moods` — daily mood per user
 - `miss_you` — miss you notifications with seen tracking
+
+## Local Development
+
+Environment variables are loaded from `.env` at the project root (via `dotenv`).
+
+1. `cp .env.example .env` and fill in `DATABASE_URL` and `SESSION_SECRET`
+2. `pnpm install`
+3. `pnpm --filter @workspace/db run push` — apply schema to DB
+4. `pnpm dev` — starts both API (port 3001) and frontend (port 5173) via `concurrently`
 
 ## TypeScript & Composite Projects
 
@@ -67,6 +78,7 @@ Every package extends `tsconfig.base.json` which sets `composite: true`. The roo
 
 ## Root Scripts
 
+- `pnpm run dev` — starts both API server and frontend concurrently (local development)
 - `pnpm run build` — runs `typecheck` first, then recursively runs `build` in all packages that define it
 - `pnpm run typecheck` — runs `tsc --build --emitDeclarationOnly` using project references
 
@@ -76,18 +88,22 @@ Every package extends `tsconfig.base.json` which sets `composite: true`. The roo
 
 Express 5 API server. Routes in `src/routes/`.
 
-- Routes: users, couples, checkins, messages, notifications
+- Routes: users, couples, checkins, messages, notifications, chat
 - Auth: express-session (session stored in memory, cookie-based)
 - Depends on: `@workspace/db`, `@workspace/api-zod`, `zod`, `bcryptjs`, `express-session`
+- Default port: 3001 (override with `PORT` env var)
+- Loads `.env` from project root automatically via `dotenv`
 
 ### `artifacts/love-app` (`@workspace/love-app`)
 
 React + Vite frontend for the relationship app.
 
-- Pages: login, onboarding, home, timeline, profile
+- Pages: login, onboarding, home, timeline, chat, profile
 - Components: BottomNav, AppLayout
 - Hooks: use-app-queries (React Query)
 - Served at previewPath `/`
+- Default port: 5173 (override with `PORT` env var)
+- Proxies `/api` requests to `http://localhost:API_PORT` (default 3001) in development
 
 ### `lib/db` (`@workspace/db`)
 
@@ -100,7 +116,7 @@ Database layer using Drizzle ORM with PostgreSQL.
 - `src/schema/moods.ts` — daily moods
 - `src/schema/missyou.ts` — miss you notifications
 
-Production migrations are handled by Replit when publishing. In development: `pnpm --filter @workspace/db run push`.
+In development: `pnpm --filter @workspace/db run push`.
 
 ### `lib/api-spec` (`@workspace/api-spec`)
 
