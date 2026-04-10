@@ -64,14 +64,15 @@ export default function ChatPage() {
       senderId: number;
     }) => {
       const isFromMe = data.senderId === user?.id;
-      const msg = isFromMe ? data.forSender : data.forReceiver;
 
-      setMessages(prev => {
-        if (prev.some(m => m.id === msg.id)) return prev;
-        return [...prev, msg];
-      });
-
+      // Own messages are shown immediately via optimistic update in handleSend.
+      // Only add partner messages here so we never get duplicates.
       if (!isFromMe) {
+        const msg = data.forReceiver;
+        setMessages(prev => {
+          if (prev.some(m => m.id === msg.id)) return prev;
+          return [...prev, msg];
+        });
         socket.emit("mark_seen");
       }
     };
@@ -137,14 +138,35 @@ export default function ChatPage() {
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     setSeenByPartner(false);
 
+    // Optimistic — show immediately so the UI never feels frozen
+    const tempId = -Date.now();
+    setMessages(prev => [...prev, {
+      id: tempId,
+      text: textToSend,
+      senderId: user!.id,
+      senderName: user?.displayName ?? "",
+      isFromMe: true,
+      sentAt: new Date().toISOString(),
+      readAt: null,
+    }]);
+
     try {
-      await fetch("/api/chat", {
+      const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: textToSend }),
       });
+      if (res.ok) {
+        const realMsg = await res.json();
+        // Replace the temp message with the server-confirmed one (gets the real id)
+        setMessages(prev =>
+          prev.map(m => m.id === tempId ? { ...realMsg, isFromMe: true } : m)
+        );
+      }
     } catch (err) {
       console.error("Send error", err);
+      // Remove the failed optimistic message
+      setMessages(prev => prev.filter(m => m.id !== tempId));
     } finally {
       setIsSending(false);
     }
