@@ -1,0 +1,77 @@
+PS C:\Users\eniay\Desktop\Projects\love-link-Just-us> pnpm run dev
+
+> workspace@0.0.0 dev C:\Users\eniay\Desktop\Projects\love-link-Just-us
+> concurrently --names "api,web" --prefix-colors "blue,green" "pnpm run dev:api" "pnpm run dev:web"
+
+[web] 
+[web] > workspace@0.0.0 dev:web C:\Users\eniay\Desktop\Projects\love-link-Just-us
+[web] > pnpm --filter @workspace/love-app run dev
+[web] 
+[api] 
+[api] > workspace@0.0.0 dev:api C:\Users\eniay\Desktop\Projects\love-link-Just-us
+[api] > pnpm --filter @workspace/api-server run dev
+[api]
+[web] 
+[web] > @workspace/love-app@0.0.0 dev C:\Users\eniay\Desktop\Projects\love-link-Just-us\artifacts\love-app
+[web] > vite --config vite.config.ts --host 0.0.0.0
+[web]
+[api] 
+[api] > @workspace/api-server@0.0.0 dev C:\Users\eniay\Desktop\Projects\love-link-Just-us\artifacts\api-server
+[api] > cross-env NODE_ENV=development tsx --env-file-if-exists ../../.env ./src/index.ts
+[api]
+[web] 
+[web]   VITE v7.3.1  ready in 1837 ms
+[web]
+[web]   ➜  Local:   http://localhost:5173/
+[web]   ➜  Network: http://172.16.25.42:5173/
+[api] 
+[api] node:internal/modules/run_main:107
+[api]     triggerUncaughtException(
+[api]     ^
+[api] Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'socket.io' imported from C:\Users\eniay\Desktop\Projects\love-link-Just-us\artifacts\api-server\src\lib\io.ts
+[api]     at Object.getPackageJSONURL (node:internal/modules/package_json_reader:301:9)
+[api]     at packageResolve (node:internal/modules/esm/resolve:768:81)
+[api]     at moduleResolve (node:internal/modules/esm/resolve:859:18)
+[api]     at defaultResolve (node:internal/modules/esm/resolve:991:11)
+[api]     at nextResolve (node:internal/modules/esm/hooks:785:28)
+[api]     at resolveBase (file:///C:/Users/eniay/Desktop/Projects/love-link-Just-us/node_modules/.pnpm/tsx@4.21.0/node_modules/tsx/dist/esm/index.mjs?1775839238710:2:3744)
+[api]     at resolveDirectory (file:///C:/Users/eniay/Desktop/Projects/love-link-Just-us/node_modules/.pnpm/tsx@4.21.0/node_modules/tsx/dist/esm/index.mjs?1775839238710:2:4243)
+[api]     at resolveTsPaths (file:///C:/Users/eniay/Desktop/Projects/love-link-Just-us/node_modules/.pnpm/tsx@4.21.0/node_modules/tsx/dist/esm/index.mjs?1775839238710:2:4984)
+[api]     at resolve (file:///C:/Users/eniay/Desktop/Projects/love-link-Just-us/node_modules/.pnpm/tsx@4.21.0/node_modules/tsx/dist/esm/index.mjs?1775839238710:2:5361)
+[api]     at nextResolve (node:internal/modules/esm/hooks:785:28) {
+[api]   code: 'ERR_MODULE_NOT_FOUND'
+[api] }
+[api]
+[api] Node.js v24.14.0
+[api] C:\Users\eniay\Desktop\Projects\love-link-Just-us\artifacts\api-server:
+[api]  ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @workspace/api-server@0.0.0 dev: `cross-env NODE_ENV=development tsx --env-file-if-exists ../../.env ./src/index.ts`
+[api] Exit status 1
+[api]  ELIFECYCLE  Command failed with exit code 1.
+[api] pnpm run dev:api exited with code 1
+[web] 17:40:47 [vite] Internal server error: Failed to resolve import "socket.io-client" from "src/hooks/useSocket.ts". Does the file exist?
+[web]   Plugin: vite:import-analysis
+[web]   File: C:/Users/eniay/Desktop/Projects/love-link-Just-us/artifacts/love-app/src/hooks/useSocket.ts:2:32
+[web]   1  |  "use strict";
+[web]   2  |  import { useEffect, useRef } from "react";
+[web]   3  |  import { io } from "socket.io-client";
+[web]      |                      ^
+[web]   4  |  let sharedSocket = null;
+[web]   5  |  let refCount = 0;
+[web]       at TransformPluginContext._formatLog (file:///C:/Users/eniay/Desktop/Projects/love-link-Just-us/node_modules/.pnpm/vite@7.3.1_@types+node@25.3_847d3f1dfd8a5a4dca3b40dafc2c9d32/node_modules/vite/dist/node/chunks/config.js:28999:43)
+[web]       at TransformPluginContext.error (file:///C:/Users/eniay/Desktop/Projects/love-link-Just-us/node_modules/.pnpm/vite@7.3.1_@types+node@25.3_847d3f1dfd8a5a4dca3b40dafc2c9d32/node_modules/vite/dist/node/chunks/config.js:28996:14)
+[web]       at normalizeUrl (file:///C:/Users/eniay/Desktop/Projects/love-link-Just-us/node_modules/.pnpm/vite@7.3.1_@types+node@25.3_847d3f1dfd8a5a4dca3b40dafc2c9d32/node_modules/vite/dist/node/chunks/config.js:27119:18)
+[web]       at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[web]       at async file:///C:/Users/eniay/Desktop/Projects/love-link-Just-us/node_modules/.pnpm/vite@7.3.1_@types+node@25.3_847d3f1dfd8a5a4dca3b40dafc2c9d32/node_modules/vite/dist/node/chunks/config.js:27177:32      
+[web]       at async Promise.all (index 1)
+[web]       at async TransformPluginContext.transform (file:///C:/Users/eniay/Desktop/Projects/love-link-Just-us/node_modules/.pnpm/vite@7.3.1_@types+node@25.3_847d3f1dfd8a5a4dca3b40dafc2c9d32/node_modules/vite/dist/node/chunks/config.js:27145:4)
+[web]       at async EnvironmentPluginContainer.transform (file:///C:/Users/eniay/Desktop/Projects/love-link-Just-us/node_modules/.pnpm/vite@7.3.1_@types+node@25.3_847d3f1dfd8a5a4dca3b40dafc2c9d32/node_modules/vite/dist/node/chunks/config.js:28797:14)
+[web]       at async loadAndTransform (file:///C:/Users/eniay/Desktop/Projects/love-link-Just-us/node_modules/.pnpm/vite@7.3.1_@types+node@25.3_847d3f1dfd8a5a4dca3b40dafc2c9d32/node_modules/vite/dist/node/chunks/config.js:22670:26)
+[web] 17:40:47 [vite] (client) Pre-transform error: Failed to resolve import "socket.io-client" from "src/hooks/useSocket.ts". Does the file exist?
+[web]   Plugin: vite:import-analysis
+[web]   File: C:/Users/eniay/Desktop/Projects/love-link-Just-us/artifacts/love-app/src/hooks/useSocket.ts:2:32
+[web]   1  |  "use strict";
+[web]   2  |  import { useEffect, useRef } from "react";
+[web]   3  |  import { io } from "socket.io-client";
+[web]      |                      ^
+[web]   4  |  let sharedSocket = null;
+[
