@@ -30,19 +30,18 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "love-app-secret-key-change-in-prod",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: false,
-      httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-    },
-  }),
-);
+export const sessionMiddleware = session({
+  secret: process.env.SESSION_SECRET || "love-app-secret-key-change-in-prod",
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: false,
+    httpOnly: true,
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+  },
+});
 
+app.use(sessionMiddleware);
 app.use("/api", router);
 
 export default app;

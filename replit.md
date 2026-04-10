@@ -16,6 +16,7 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - **API codegen**: Orval (from OpenAPI spec)
 - **Build**: esbuild (CJS bundle)
 - **Auth**: express-session + bcryptjs
+- **Real-time**: Socket.IO (WebSockets)
 
 ## Structure
 
@@ -49,7 +50,7 @@ The main artifact is a 2-person private relationship app named **"Us"** at previ
 5. **Miss You Button** — instantly notifies partner they're missed
 6. **Mood Check** — happy/neutral/sad mood set once per day, visible to partner
 7. **Daily Message Timeline** — 1 short message per person per day, shared feed
-8. **Private Chat** — real-time messaging between partners
+8. **Private Chat** — real-time messaging via Socket.IO with typing indicator, seen/read status, and animated typing bubble
 
 ### Database Tables
 - `users` — accounts with session, pairing code, coupleId
@@ -58,6 +59,7 @@ The main artifact is a 2-person private relationship app named **"Us"** at previ
 - `messages` — daily messages per couple
 - `moods` — daily mood per user
 - `miss_you` — miss you notifications with seen tracking
+- `chat_messages` — private chat messages with `readAt` timestamp for seen status
 
 ## Local Development
 
@@ -90,9 +92,11 @@ Express 5 API server. Routes in `src/routes/`.
 
 - Routes: users, couples, checkins, messages, notifications, chat
 - Auth: express-session (session stored in memory, cookie-based)
-- Depends on: `@workspace/db`, `@workspace/api-zod`, `zod`, `bcryptjs`, `express-session`
+- Depends on: `@workspace/db`, `@workspace/api-zod`, `zod`, `bcryptjs`, `express-session`, `socket.io`
+- Socket.IO at `/socket.io` — authenticated via session cookie; rooms per couple (`couple:{id}`)
+- Socket events: `new_message`, `partner_typing`, `message_seen` (server→client); `typing_start`, `typing_stop`, `mark_seen` (client→server)
 - Default port: 3001 (override with `PORT` env var)
-- Loads `.env` from project root automatically via `dotenv`
+- Loads `.env` from project root automatically via `--env-file-if-exists` tsx flag
 
 ### `artifacts/love-app` (`@workspace/love-app`)
 

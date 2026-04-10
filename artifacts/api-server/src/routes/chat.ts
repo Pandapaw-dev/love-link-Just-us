@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { db, usersTable, couplesTable, chatMessagesTable } from "@workspace/db";
-import { eq, and, gt, asc, desc } from "drizzle-orm";
+import { eq, and, gt, asc, isNull } from "drizzle-orm";
 import { requireAuth } from "../lib/auth.js";
+import { getIO } from "../lib/io.js";
 import { z } from "zod";
 
 const router = Router();
@@ -25,11 +26,12 @@ router.get("/", requireAuth, async (req, res) => {
   const since = req.query.since ? Number(req.query.since) : undefined;
   const limit = Number(req.query.limit) || 50;
 
-  let query = db.select({
+  const msgs = await db.select({
     id: chatMessagesTable.id,
     senderId: chatMessagesTable.senderId,
     text: chatMessagesTable.text,
     sentAt: chatMessagesTable.sentAt,
+    readAt: chatMessagesTable.readAt,
     senderName: usersTable.displayName,
   })
     .from(chatMessagesTable)
@@ -42,8 +44,6 @@ router.get("/", requireAuth, async (req, res) => {
     .orderBy(asc(chatMessagesTable.sentAt))
     .limit(limit);
 
-  const msgs = await query;
-
   res.json({
     messages: msgs.map(m => ({
       id: m.id,
@@ -51,6 +51,7 @@ router.get("/", requireAuth, async (req, res) => {
       senderName: m.senderName || "Unknown",
       text: m.text,
       sentAt: m.sentAt.toISOString(),
+      readAt: m.readAt ? m.readAt.toISOString() : null,
       isFromMe: m.senderId === req.session.userId,
     })),
   });
@@ -76,14 +77,25 @@ router.post("/", requireAuth, async (req, res) => {
     text: parsed.data.text,
   }).returning();
 
-  res.status(201).json({
+  const payload = {
     id: msg.id,
     senderId: msg.senderId,
     senderName: info.me.displayName,
     text: msg.text,
     sentAt: msg.sentAt.toISOString(),
+    readAt: null,
     isFromMe: true,
+  };
+
+  const partnerPayload = { ...payload, isFromMe: false };
+
+  getIO()?.to(`couple:${info.couple.id}`).emit("new_message", {
+    forSender: payload,
+    forReceiver: partnerPayload,
+    senderId: msg.senderId,
   });
+
+  res.status(201).json(payload);
 });
 
 export default router;
