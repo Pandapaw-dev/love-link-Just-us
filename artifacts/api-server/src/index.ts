@@ -14,5 +14,5 @@ const server = createServer(app);
 initIO(server, sessionMiddleware);
 
 server.listen(port, () => {
-  logger.info({ port }, "Server listening");
+  logger.info({ port }, "Server listening")
 });
